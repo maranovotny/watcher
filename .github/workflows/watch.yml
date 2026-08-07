@@ -1,9 +1,11 @@
 # Ulozit jako: .github/workflows/watch.yml v repozitari, kde je watch_tickets.py
 name: Watch IMAX Odyssea tickets
 
+concurrency:
+     group: imax-watcher
+     cancel-in-progress: true
+
 on:
-  schedule:
-    - cron: '*/5 * * * *'   # kazdych 5 minut
   workflow_dispatch: {}       # umoznuje rucni spusteni z GitHub UI
 
 permissions:
