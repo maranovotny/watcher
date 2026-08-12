@@ -72,26 +72,28 @@ def save_known(known: set) -> None:
 
 
 def notify(message: str) -> None:
-       print(message)
-       if not NTFY_TOPIC:
-           print("NTFY_TOPIC neni nastaveny - notifikace se neposila.", file=sys.stderr)
-           return
-       headers = {"Title": "Nove vstupenky - Odyssea IMAX"}
-       if NOTIFY_EMAIL:
-           headers["Email"] = NOTIFY_EMAIL
-       try:
-           urllib.request.urlopen(
-               urllib.request.Request(
-                   f"https://ntfy.sh/{NTFY_TOPIC}",
-                   data=message.encode("utf-8"),
-                   headers=headers,
-                   method="POST",
-               ),
-               timeout=10,
-           )
-       except Exception as exc:
-           print(f"Nepodarilo se poslat notifikaci: {exc}", file=sys.stderr)
-
+    print(message)
+    if not NTFY_TOPIC:
+        print("NTFY_TOPIC neni nastaveny - notifikace se neposila.", file=sys.stderr)
+        return
+    headers = {
+        "Title": "Nove vstupenky - Odyssea IMAX",
+        "Content-Type": "text/plain"
+    }
+    if NOTIFY_EMAIL:
+        headers["Email"] = NOTIFY_EMAIL
+    try:
+        urllib.request.urlopen(
+            urllib.request.Request(
+                f"https://ntfy.sh/{NTFY_TOPIC}",
+                data=message.encode("utf-8"),
+                headers=headers,
+                method="POST",
+            ),
+            timeout=10,
+        )
+    except Exception as exc:  # noqa: BLE001
+        print(f"Nepodarilo se poslat notifikaci: {exc}", file=sys.stderr)
 
 def main() -> None:
     known = load_known()
