@@ -30,6 +30,7 @@ LANG = "cs_CZ"
 DAYS_AHEAD = 60          # jak daleko do budoucnosti kontrolovat
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "state.json")
 NTFY_TOPIC = os.environ.get("NTFY_TOPIC", "")
+NOTIFY_EMAIL = os.environ.get("NOTIFY_EMAIL", "")
 # ---------------------------------------------------------------------------
 
 URL_TEMPLATE = (
@@ -71,22 +72,25 @@ def save_known(known: set) -> None:
 
 
 def notify(message: str) -> None:
-    print(message)
-    if not NTFY_TOPIC:
-        print("NTFY_TOPIC neni nastaveny - notifikace se neposila.", file=sys.stderr)
-        return
-    try:
-        urllib.request.urlopen(
-            urllib.request.Request(
-                f"https://ntfy.sh/{NTFY_TOPIC}",
-                data=message.encode("utf-8"),
-                headers={"Title": "Nove vstupenky - Odyssea IMAX"},
-                method="POST",
-            ),
-            timeout=10,
-        )
-    except Exception as exc:  # noqa: BLE001
-        print(f"Nepodarilo se poslat notifikaci: {exc}", file=sys.stderr)
+       print(message)
+       if not NTFY_TOPIC:
+           print("NTFY_TOPIC neni nastaveny - notifikace se neposila.", file=sys.stderr)
+           return
+       headers = {"Title": "Nove vstupenky - Odyssea IMAX"}
+       if NOTIFY_EMAIL:
+           headers["Email"] = NOTIFY_EMAIL
+       try:
+           urllib.request.urlopen(
+               urllib.request.Request(
+                   f"https://ntfy.sh/{NTFY_TOPIC}",
+                   data=message.encode("utf-8"),
+                   headers=headers,
+                   method="POST",
+               ),
+               timeout=10,
+           )
+       except Exception as exc:
+           print(f"Nepodarilo se poslat notifikaci: {exc}", file=sys.stderr)
 
 
 def main() -> None:
