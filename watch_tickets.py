@@ -77,18 +77,15 @@ def notify(message: str) -> None:
         print("NTFY_TOPIC neni nastaveny - notifikace se neposila.", file=sys.stderr)
         return
     try:
-        headers = {"Title": "Nove vstupenky - Odyssea IMAX"}
-        if NOTIFY_EMAIL:
-            headers["Email"] = NOTIFY_EMAIL
-        req = urllib.request.Request(
-            f"https://ntfy.sh/{NTFY_TOPIC}",
-            data=message.encode("utf-8"),
-            headers=headers,
-            method="POST",
+        urllib.request.urlopen(
+            urllib.request.Request(
+                f"https://ntfy.sh/{NTFY_TOPIC}",
+                data=message.encode("utf-8"),
+                headers={"Title": "Nove vstupenky - Odyssea IMAX"},
+                method="POST",
+            ),
+            timeout=10,
         )
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            pass
-        print(f"Notifikace poslana (status {resp.status})")
     except Exception as exc:  # noqa: BLE001
         print(f"Nepodarilo se poslat notifikaci: {exc}", file=sys.stderr)
 
